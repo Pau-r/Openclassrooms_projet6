@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
+
 const auth = require('../middleware/auth');
 
 const Sauce = require("../models/sauce");
 
-router.use("/api/auth", userRoutes);
+
 
 router.get("/api/sauces/:id", (req, res, next) => {
     Sauce.findOne({ userId: req.params.id })

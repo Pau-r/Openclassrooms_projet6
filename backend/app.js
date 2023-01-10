@@ -1,10 +1,8 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const userRouter = require("./routes/user");
 const sauceRouter = require("./routes/sauce");
-const userRoutes = require("./routes/user");
-
-
 
 mongoose.connect("mongodb+srv://pauliner:toipsL1sfW9GbZJf@cluster0.djeelzt.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
@@ -21,18 +19,8 @@ app.use((req, res, next) => {
     next();
 });
 
-
+app.use("/api/auth", userRouter);
 app.use("/api/sauces", sauceRouter);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 module.exports = app;
-
-/*app.post('http://localhost:3000/', (req, res, next) => {
-    delete req.body._id;
-    const sauce = new Sauce({
-        ...req.body
-    });
-    sauce.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-        .catch(error => res.status(400).json({ error }));
-        next();
-});*/
