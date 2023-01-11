@@ -1,8 +1,10 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const mongoose = require("mongoose");
 const userRouter = require("./routes/user");
 const sauceRouter = require("./routes/sauce");
+const path = require('path');
 
 mongoose.connect("mongodb+srv://pauliner:toipsL1sfW9GbZJf@cluster0.djeelzt.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
@@ -18,6 +20,8 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
+app.use(bodyParser.json());
 
 app.use("/api/auth", userRouter);
 app.use("/api/sauces", sauceRouter);
