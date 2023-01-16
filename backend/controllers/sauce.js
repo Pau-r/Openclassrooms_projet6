@@ -22,14 +22,26 @@ exports.addLikes = (req, res, next) => {
             let userId = req.body.userId;
 
             if (like == 1) {
-                sauce.usersLiked.push(userId);
-                sauce.likes++;
+                if (!sauce.usersLiked.includes(userId)) {
+                    sauce.usersLiked.push(userId);
+                    sauce.likes++;
+                }
             } else if (like == 0) {
-                sauce.usersLiked.pop(userId);
-                sauce.likes--;
+                if (sauce.usersLiked.includes(userId)) {
+                    let indexUserId = sauce.usersLiked.indexOf(userId);
+                    sauce.usersLiked.splice(indexUserId, 1);
+                    sauce.likes--;
+                }
+                if (sauce.usersDisliked.includes(userId)) {
+                    let indexUserId = sauce.usersDisliked.indexOf(userId);
+                    sauce.usersDisliked.splice(indexUserId, 1);
+                    sauce.dislikes--;
+                }
             } else {
-                sauce.usersDisliked.push(userId);
-                sauce.dislikes++;
+                if (!sauce.usersDisliked.includes(userId)) {
+                    sauce.usersDisliked.push(userId);
+                    sauce.dislikes++;
+                }
             }
             return Sauce.updateOne({ _id: req.params.id }, sauce);
         }))
@@ -49,8 +61,8 @@ exports.modifySauce = (req, res, next) => {
 };
 
 exports.deleteSauce = (req, res, next) => {
-    Sauce.deleteOne({ _id: req.params.id })
-        .then((sauce => {
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => {
             if (sauce.userId != req.auth.userId) {
                 res.status(401).json({ message: "Non-autorisé" });
             } else {
@@ -58,10 +70,10 @@ exports.deleteSauce = (req, res, next) => {
                 fs.unlink(`/images/${filename}`, () => {
                     Sauce.deleteOne({ _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'La sauce a été supprimée !' }))
-                        .catch(error => res.status(401).json({ error }));
+                        .catch(error => res.status(400).json({ error }));
                 });
             }
-        }))
+        })
         .catch(error => {
             res.status(500).json({ error });
         });
